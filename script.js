@@ -1,30 +1,50 @@
 const teams = ['Los Aliens','Los Galaticos','Fc Revolution','Hydra'];
 
-// initial results (includes scorers where provided)
+// initial results (cleaned and normalized)
 const initialMatches = [
   // Round 1: Los Aliens 3 - Hydra 3
-  { round: 1, home: 'Los Aliens', away: 'Hydra', homeGoals: 3, awayGoals: 3,
+  {
+    round: 1,
+    home: 'Los Aliens',
+    away: 'Hydra',
+    homeGoals: 3,
+    awayGoals: 3,
     homeScorers: ['Vitor Soares', 'Felipe Vieira', 'Jean'],
     awayScorers: []
   },
   // Round 1: Los Galaticos 9 - Fc Revolution 6
-  { round: 1, home: 'Los Galaticos', away: 'Fc Revolution', homeGoals: 9, awayGoals: 6,
-    // Rodada 1 - 3 joao gabriel, 2 neto, 1 berbel, 1 manhaes, 1 luiz e 1 ghesti
+  {
+    round: 1,
+    home: 'Los Galaticos',
+    away: 'Fc Revolution',
+    homeGoals: 9,
+    awayGoals: 6,
+    // Rodada 1 - 3 Joao Gabriel, 2 Neto, 1 Berbel, 1 Manhaes, 1 Luiz, 1 Ghesti
     homeScorers: ['Joao Gabriel x3', 'Neto x2', 'Berbel', 'Manhaes', 'Luiz', 'Ghesti'],
     awayScorers: []
   },
   // Round 2: Los Aliens 5 - Fc Revolution 1
-  { round: 2, home: 'Los Aliens', away: 'Fc Revolution', homeGoals: 5, awayGoals: 1,
-    // Jean - 2 gol, Pedrin -1, Ryan -1, Alisson -1 (rodada 2)
+  {
+    round: 2,
+    home: 'Los Aliens',
+    away: 'Fc Revolution',
+    homeGoals: 5,
+    awayGoals: 1,
+    // Rodada 2 - Jean x2, Pedrin, Ryan, Alisson
     homeScorers: ['Jean x2', 'Pedrin', 'Ryan', 'Alisson'],
     awayScorers: []
   },
   // Round 2: Los Galaticos 3 - Hydra 2
-  { round: 2, home: 'Los Galaticos', away: 'Hydra', homeGoals: 3, awayGoals: 2,
-    // Rodada 2 - 2 rud e 1 manhaes
+  {
+    round: 2,
+    home: 'Los Galaticos',
+    away: 'Hydra',
+    homeGoals: 3,
+    awayGoals: 2,
+    // Rodada 2 - Rud x2, Manhaes
     homeScorers: ['Rud x2', 'Manhaes'],
     awayScorers: []
-  },
+  }
 ];
 
 let matches = [];
@@ -304,3 +324,16 @@ matches.forEach(m=>{
 saveMatchesToStorage();
 
 renderMatches(); renderTable(); renderArtilharia();
+
+// Helper: download a cleaned `initialMatches` JS snippet (ready to paste into script.js)
+window.downloadCleanInitialMatches = function(){
+  try{
+    // build cleaned initialMatches from current matches (deep-copy)
+    const cleaned = (matches && matches.length) ? matches : initialMatches;
+    const snippet = 'const initialMatches = ' + JSON.stringify(cleaned, null, 2) + ';\n';
+    const blob = new Blob([snippet], { type: 'text/javascript;charset=utf-8' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a'); a.href = url; a.download = 'initialMatches-clean.js'; document.body.appendChild(a); a.click(); a.remove(); URL.revokeObjectURL(url);
+    console.log('Downloaded initialMatches-clean.js — abra e cole o bloco dentro de script.js no repositório.');
+  }catch(e){ console.error('download failed', e); }
+}
