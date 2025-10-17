@@ -44,7 +44,83 @@ const initialMatches = [
     // Rodada 2 - Rud x2, Manhaes
     homeScorers: ['Rud x2', 'Manhaes'],
     awayScorers: []
-  }
+  },
+  // Round 3: Los Aliens vs Los Galaticos
+  {
+    round: 3,
+    home: 'Los Aliens',
+    away: 'Los Galaticos',
+    homeGoals: null,
+    awayGoals: null,
+    homeScorers: [],
+    awayScorers: []
+  },
+  {
+    round: 3,
+    home: 'Fc Revolution',
+    away: 'Hydra',
+    homeGoals: null,
+    awayGoals: null,
+    homeScorers: [],
+    awayScorers: []
+  },
+  // Round 4: reverse of Round 1 (pending)
+  {
+    round: 4,
+    home: 'Hydra',
+    away: 'Los Aliens',
+    homeGoals: null,
+    awayGoals: null,
+    homeScorers: [],
+    awayScorers: []
+  },
+  {
+    round: 4,
+    home: 'Fc Revolution',
+    away: 'Los Galaticos',
+    homeGoals: null,
+    awayGoals: null,
+    homeScorers: [],
+    awayScorers: []
+  },
+  // Round 5: reverse of Round 2 (pending)
+  {
+    round: 5,
+    home: 'Fc Revolution',
+    away: 'Los Aliens',
+    homeGoals: null,
+    awayGoals: null,
+    homeScorers: [],
+    awayScorers: []
+  },
+  {
+    round: 5,
+    home: 'Hydra',
+    away: 'Los Galaticos',
+    homeGoals: null,
+    awayGoals: null,
+    homeScorers: [],
+    awayScorers: []
+  },
+  // Round 6: reverse of Round 3 (pending)
+  {
+    round: 6,
+    home: 'Los Galaticos',
+    away: 'Los Aliens',
+    homeGoals: null,
+    awayGoals: null,
+    homeScorers: [],
+    awayScorers: []
+  },
+  {
+    round: 6,
+    home: 'Hydra',
+    away: 'Fc Revolution',
+    homeGoals: null,
+    awayGoals: null,
+    homeScorers: [],
+    awayScorers: []
+  },
 ];
 
 let matches = [];
@@ -97,7 +173,7 @@ function loadMatchesFromStorage(){
   try{ const raw = localStorage.getItem(STORAGE_KEY); if(!raw) return null; return JSON.parse(raw); }catch(e){ console.warn('load error',e); return null; }
 }
 
-window.addMatch = function(m){ if(!m) return; if(!m.round) m.round=3; matches.push(m); saveMatchesToStorage(); renderMatches(); renderTable(); }
+window.addMatch = function(m){ if(!m) return; if(!m.round) m.round=3; matches.push(m); saveMatchesToStorage(); renderMatches(); renderTable(); updateRoundsSummary(); }
 window.clearMatchesStorage = function(){ localStorage.removeItem(STORAGE_KEY); location.reload(); }
 
 // Helpers to modify scorers from console
@@ -112,7 +188,7 @@ window.addScorer = function(matchIdx, side, name, count){
   const scorerStr = (count>1) ? `${name} x${count}` : String(name);
   if(side === 'home') m.homeScorers = (m.homeScorers||[]).concat([scorerStr]);
   else m.awayScorers = (m.awayScorers||[]).concat([scorerStr]);
-  saveMatchesToStorage(); renderMatches(); renderTable(); renderArtilharia();
+  saveMatchesToStorage(); renderMatches(); renderTable(); renderArtilharia(); updateRoundsSummary();
   console.log('added scorer', scorerStr, 'to', m.home, 'vs', m.away);
 }
 
@@ -125,7 +201,7 @@ window.removeScorer = function(matchIdx, side, name){
   const filterFn = s => { const p = parseScorerString(s); return p.name.toLowerCase() !== String(name).toLowerCase(); };
   if(side === 'home') m.homeScorers = (m.homeScorers||[]).filter(filterFn);
   else m.awayScorers = (m.awayScorers||[]).filter(filterFn);
-  saveMatchesToStorage(); renderMatches(); renderTable(); renderArtilharia();
+  saveMatchesToStorage(); renderMatches(); renderTable(); renderArtilharia(); updateRoundsSummary();
   console.log('removed scorer', name, 'from', m.home, 'vs', m.away);
 }
 
@@ -138,11 +214,14 @@ function computeTable(matchList){
   matchList.forEach(m=>{
     const a = table[m.home]; const b = table[m.away];
     if(!a||!b) return;
+    // ignore pending fixtures (no numeric goals yet)
+    const hg = m.homeGoals; const ag = m.awayGoals;
+    if(typeof hg !== 'number' || typeof ag !== 'number') return;
     a.played++; b.played++;
-    a.goalsFor += (m.homeGoals||0); a.goalsAgainst += (m.awayGoals||0);
-    b.goalsFor += (m.awayGoals||0); b.goalsAgainst += (m.homeGoals||0);
-    if((m.homeGoals||0) > (m.awayGoals||0)){ a.wins++; a.points+=3; b.losses++; }
-    else if((m.homeGoals||0) < (m.awayGoals||0)){ b.wins++; b.points+=3; a.losses++; }
+    a.goalsFor += hg; a.goalsAgainst += ag;
+    b.goalsFor += ag; b.goalsAgainst += hg;
+    if(hg > ag){ a.wins++; a.points+=3; b.losses++; }
+    else if(hg < ag){ b.wins++; b.points+=3; a.losses++; }
     else { a.draws++; b.draws++; a.points+=1; b.points+=1; }
   });
   Object.values(table).forEach(r=> r.goalDiff = r.goalsFor - r.goalsAgainst);
@@ -231,8 +310,11 @@ function renderMatches(){
     const fallbackB = document.createElement('div'); fallbackB.className='team-badge'; fallbackB.style.display='none'; fallbackB.style.alignItems='center'; fallbackB.style.justifyContent='center'; fallbackB.style.color='#fff'; fallbackB.style.fontWeight='700'; fallbackB.style.background = teamColors[m.away] || '#334155'; fallbackB.textContent = initials(m.away);
     imgB.onload = ()=>{ fallbackB.style.display='none'; imgB.style.display=''; }; imgB.onerror = ()=>{ imgB.style.display='none'; fallbackB.style.display='flex'; };
     const spanB = document.createElement('span'); spanB.textContent = m.away; right.appendChild(imgB); right.appendChild(fallbackB); right.appendChild(spanB);
-    const score = document.createElement('div'); score.className='score'; score.textContent = `${m.homeGoals || 0} - ${m.awayGoals || 0}`;
-    li.appendChild(left); li.appendChild(score); li.appendChild(right); ul.appendChild(li);
+    const score = document.createElement('div'); score.className='score';
+    const hasScore = (typeof m.homeGoals === 'number') && (typeof m.awayGoals === 'number');
+    score.textContent = hasScore ? `${m.homeGoals} - ${m.awayGoals}` : '—';
+    li.appendChild(left); li.appendChild(score); li.appendChild(right);
+    ul.appendChild(li);
   });
 }
 
@@ -247,13 +329,14 @@ if(!window._matchDelegationInit){
 // Simple modal
 function openSimpleModal(match){
   const modal = document.getElementById('match-modal'); if(!modal) return; const backdrop = document.getElementById('simple-backdrop'); const closeBtn = document.getElementById('simple-close');
-  document.getElementById('simple-home-name').textContent = match.home + ` (${match.homeGoals||0})`;
-  document.getElementById('simple-away-name').textContent = match.away + ` (${match.awayGoals||0})`;
+  const hasScore = (typeof match.homeGoals === 'number') && (typeof match.awayGoals === 'number');
+  document.getElementById('simple-home-name').textContent = match.home + (hasScore ? ` (${match.homeGoals})` : '');
+  document.getElementById('simple-away-name').textContent = match.away + (hasScore ? ` (${match.awayGoals})` : '');
   // format scorers as lines with ball emoji and goal counts
   const hsEl = document.getElementById('simple-home-scorers'); const asEl = document.getElementById('simple-away-scorers');
   hsEl.innerHTML = ''; asEl.innerHTML = '';
   const formatScorers = (arr, container) => {
-    if(!arr || !arr.length){ container.textContent = 'Nenhum registrado'; return; }
+    if(!arr || !arr.length){ container.textContent = hasScore ? 'Nenhum registrado' : 'Aguardando resultado'; return; }
     arr.forEach(item=>{
       const parsed = parseScorerString(item);
       const div = document.createElement('div'); div.className = 'scorer-line';
@@ -283,6 +366,9 @@ if(stored && Array.isArray(stored) && stored.length){
         if((!found.awayScorers || !found.awayScorers.length) && im.awayScorers && im.awayScorers.length){
           found.awayScorers = im.awayScorers.slice();
         }
+      } else {
+        // add missing match from initial set (e.g., new rounds added later)
+        matches.push({ ...im });
       }
     });
     // persist merged result
@@ -324,6 +410,19 @@ matches.forEach(m=>{
 saveMatchesToStorage();
 
 renderMatches(); renderTable(); renderArtilharia();
+
+// Update dynamic rounds summary (completed rounds with at least one played match)
+function updateRoundsSummary(){
+  const el = document.getElementById('rounds-summary'); if(!el) return;
+  const roundsWithScores = new Set();
+  matches.forEach(m=>{
+    if(typeof m.homeGoals === 'number' && typeof m.awayGoals === 'number') roundsWithScores.add(m.round);
+  });
+  const count = roundsWithScores.size;
+  el.textContent = `${count} realizada${count===1?'':'s'}`;
+}
+
+updateRoundsSummary();
 
 // Helper: download a cleaned `initialMatches` JS snippet (ready to paste into script.js)
 window.downloadCleanInitialMatches = function(){
