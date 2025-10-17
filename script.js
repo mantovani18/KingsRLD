@@ -21,7 +21,7 @@ const initialMatches = [
     awayGoals: 6,
     // Rodada 1 - 3 Joao Gabriel, 2 Neto, 1 Berbel, 1 Manhaes, 1 Luiz, 1 Ghesti
     homeScorers: ['Joao Gabriel x3', 'Neto x2', 'Berbel', 'Manhaes', 'Luiz', 'Ghesti'],
-    awayScorers: []
+     awayScorers: ['Vitinho', 'Bolinha', 'Leo Leite x3', 'Roque']
   },
   // Round 2: Los Aliens 5 - Fc Revolution 1
   {
@@ -32,7 +32,7 @@ const initialMatches = [
     awayGoals: 1,
     // Rodada 2 - Jean x2, Pedrin, Ryan, Alisson
     homeScorers: ['Jean x2', 'Pedrin', 'Ryan', 'Alisson'],
-    awayScorers: []
+        awayScorers: ['Roque']
   },
   // Round 2: Los Galaticos 3 - Hydra 2
   {
@@ -337,3 +337,4 @@ window.downloadCleanInitialMatches = function(){
     console.log('Downloaded initialMatches-clean.js — abra e cole o bloco dentro de script.js no repositório.');
   }catch(e){ console.error('download failed', e); }
 }
+
