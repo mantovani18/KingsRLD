@@ -52,12 +52,19 @@ function initials(name){
 // parse a scorer string like 'Jean x2' or 'Joao Gabriel x3' or just 'Jean'
 function parseScorerString(s){
   if(!s) return { name:'', count:0 };
-  const m = String(s).trim().match(/^(.*)\s+x(\d+)$/i);
-  if(m){ return { name: m[1].trim(), count: parseInt(m[2],10) || 1 }; }
-  // fallback: try to detect a trailing number or default to 1
-  const m2 = String(s).trim().match(/^(.*)\s+(\d+)$/);
-  if(m2){ return { name: m2[1].trim(), count: parseInt(m2[2],10) || 1 }; }
-  return { name: String(s).trim(), count: 1 };
+  let str = String(s).trim();
+  // remove any ball emojis anywhere and count them
+  const balls = (str.match(/⚽/g) || []).length;
+  str = str.replace(/⚽/g, '').trim();
+  // explicit 'xN' pattern
+  const m = str.match(/^(.*)\s+x(\d+)$/i);
+  if(m){ return { name: m[1].trim(), count: parseInt(m[2],10) || (balls||1) }; }
+  // trailing number like 'Name 2'
+  const m2 = str.match(/^(.*)\s+(\d+)$/);
+  if(m2){ return { name: m2[1].trim(), count: parseInt(m2[2],10) || (balls||1) }; }
+  // if we detected emoji count, use it
+  if(balls>0) return { name: str, count: balls };
+  return { name: str, count: 1 };
 }
 
 const STORAGE_KEY = 'kings_matches_v1';
@@ -267,16 +274,19 @@ if(stored && Array.isArray(stored) && stored.length){
 function normalizeScorerString(s){
   if(!s) return null;
   let str = String(s).trim();
-  // detect sequences of ball emoji and convert to xN
-  const ballMatch = str.match(/^(.*)\s*[⚽]+\s*$/);
-  if(ballMatch){ const name = ballMatch[1].trim(); const count = (str.match(/⚽/g)||[]).length || 1; return count>1? `${name} x${count}`: name; }
-  // remove stray trailing non-letters and extra spaces
-  str = str.replace(/\s+/g,' ').replace(/\s+$/,'');
-  // already in 'Name xN' form?
-  if(/\bx\d+$/i.test(str)) return str;
+  // count and remove all ball emojis anywhere in the string
+  const balls = (str.match(/⚽/g) || []).length;
+  str = str.replace(/⚽/g, '').trim();
+  // normalize multiple spaces
+  str = str.replace(/\s+/g,' ').trim();
+  // if already 'Name xN'
+  const m = str.match(/^(.*)\s+x(\d+)$/i);
+  if(m) return (parseInt(m[2],10)>1) ? `${m[1].trim()} x${parseInt(m[2],10)}` : m[1].trim();
   // trailing number like 'Name 2' -> convert
-  const m = str.match(/^(.*)\s+(\d+)$/);
-  if(m) return `${m[1].trim()} x${m[2]}`;
+  const m2 = str.match(/^(.*)\s+(\d+)$/);
+  if(m2) return (parseInt(m2[2],10)>1) ? `${m2[1].trim()} x${parseInt(m2[2],10)}` : m2[1].trim();
+  // if emoji count exists, use it
+  if(balls>0) return (balls>1) ? `${str} x${balls}` : str;
   return str;
 }
 
