@@ -10,12 +10,7 @@ const initialMatches = [
   // Round 1: Los Galaticos 9 - Fc Revolution 6
   { round: 1, home: 'Los Galaticos', away: 'Fc Revolution', homeGoals: 9, awayGoals: 6,
     // Rodada 1 - 3 joao gabriel, 2 neto, 1 berbel, 1 manhaes, 1 luiz e 1 ghesti
-    homeScorers: ['Joao Gabriel ⚽⚽⚽',
-    'Neto ⚽⚽',
-    'Berbel ⚽',
-    'Manhaes ⚽',
-    'Luiz ⚽', 
-    'Ghesti ⚽'],
+    homeScorers: ['Joao Gabriel x3', 'Neto x2', 'Berbel', 'Manhaes', 'Luiz', 'Ghesti'],
     awayScorers: []
   },
   // Round 2: Los Aliens 5 - Fc Revolution 1
@@ -267,5 +262,35 @@ if(stored && Array.isArray(stored) && stored.length){
     saveMatchesToStorage();
   }catch(e){ console.warn('merge scorers error', e); }
 } else { matches = initialMatches.slice(); saveMatchesToStorage(); }
+
+// Normalize scorer strings (emoji sequences, trailing spaces) to 'Name' or 'Name xN'
+function normalizeScorerString(s){
+  if(!s) return null;
+  let str = String(s).trim();
+  // detect sequences of ball emoji and convert to xN
+  const ballMatch = str.match(/^(.*)\s*[⚽]+\s*$/);
+  if(ballMatch){ const name = ballMatch[1].trim(); const count = (str.match(/⚽/g)||[]).length || 1; return count>1? `${name} x${count}`: name; }
+  // remove stray trailing non-letters and extra spaces
+  str = str.replace(/\s+/g,' ').replace(/\s+$/,'');
+  // already in 'Name xN' form?
+  if(/\bx\d+$/i.test(str)) return str;
+  // trailing number like 'Name 2' -> convert
+  const m = str.match(/^(.*)\s+(\d+)$/);
+  if(m) return `${m[1].trim()} x${m[2]}`;
+  return str;
+}
+
+// ensure scorer arrays normalized and match goals are consistent with scorer counts when possible
+matches.forEach(m=>{
+  if(m.homeScorers && Array.isArray(m.homeScorers)) m.homeScorers = m.homeScorers.map(normalizeScorerString).filter(Boolean);
+  if(m.awayScorers && Array.isArray(m.awayScorers)) m.awayScorers = m.awayScorers.map(normalizeScorerString).filter(Boolean);
+  // recalc goals from scorers when totals differ or when scorer info exists
+  const homeFromScorers = (m.homeScorers||[]).reduce((acc,s)=>{ const p = parseScorerString(s); return acc + (p.count||0); },0);
+  const awayFromScorers = (m.awayScorers||[]).reduce((acc,s)=>{ const p = parseScorerString(s); return acc + (p.count||0); },0);
+  if(homeFromScorers && homeFromScorers !== (m.homeGoals||0)) m.homeGoals = homeFromScorers;
+  if(awayFromScorers && awayFromScorers !== (m.awayGoals||0)) m.awayGoals = awayFromScorers;
+});
+
+saveMatchesToStorage();
 
 renderMatches(); renderTable(); renderArtilharia();
