@@ -1,0 +1,100 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Kings League — Placar</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <header class="site-header">
+    <div class="brand">
+    <img src="Logo.jpg" alt="Kings League" class="league-logo">
+      <div>
+        <h1>Kings League</h1>
+      </div>
+    </div>
+    <div class="summary">
+      <div class="summary-item">
+        <strong>Rodadas</strong>
+        <span>2 realizadas</span>
+      </div>
+      <div class="summary-item">
+        <strong>Times</strong>
+        <span>4</span>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    <section id="matches">
+      <h2>Rodadas</h2>
+      <div class="rounds-grid">
+        <div class="round-card" id="round-1">
+          <div class="round-head">Rodada 1</div>
+          <ul class="match-list"></ul>
+        </div>
+
+        <div class="round-card" id="round-2">
+          <div class="round-head">Rodada 2</div>
+          <ul class="match-list"></ul>
+        </div>
+
+        <div class="round-card pending" id="round-3">
+          <div class="round-head">Rodada 3</div>
+          <p class="muted">Pendentes — resultado no domingo.</p>
+          <ul class="match-list"></ul>
+        </div>
+      </div>
+      <p class="matches-note">Clicando em jogos é possível ver quem marcou na partida selecionada</p>
+    </section>
+
+    <section id="table">
+      <h2>Tabela</h2>
+      <table>
+        <thead>
+          <tr>
+            <th>Pos</th>
+            <th>Time</th>
+            <th>J</th>
+            <th>V</th>
+            <th>E</th>
+            <th>D</th>
+            <th>GP</th>
+            <th>GC</th>
+            <th>SG</th>
+            <th>P</th>
+          </tr>
+        </thead>
+        <tbody id="table-body"></tbody>
+      </table>
+    </section>
+    
+    <section id="artilharia">
+      <h2>Artilharia</h2>
+      <div class="artilharia-card">
+        <div id="artilharia-table-container" class="artilharia-table-wrap">
+          <p class="muted">Carregando artilharia...</p>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <script src="script.js"></script>
+  <!-- Simple match detail modal -->
+  <div id="match-modal" class="simple-modal" aria-hidden="true">
+    <div class="simple-backdrop" id="simple-backdrop"></div>
+    <div class="simple-box" role="dialog" aria-modal="true">
+      <button id="simple-close" class="simple-close">×</button>
+      <h3 id="simple-title">Detalhes da partida</h3>
+      <div id="simple-body">
+        <div><strong id="simple-home-name"></strong></div>
+        <div id="simple-home-scorers">—</div>
+        <hr />
+        <div><strong id="simple-away-name"></strong></div>
+        <div id="simple-away-scorers">—</div>
+      </div>
+    </div>
+  </div>
+</body>
+</html>
