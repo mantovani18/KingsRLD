@@ -352,40 +352,10 @@ function openSimpleModal(match){
 function closeSimpleModal(){ const modal = document.getElementById('match-modal'); if(!modal) return; modal.classList.remove('show'); modal.setAttribute('aria-hidden','true'); }
 
 // init load
-const stored = loadMatchesFromStorage();
-if(stored && Array.isArray(stored)) {
-  // If stored matches are missing any round, always start from initialMatches
-  const roundsStored = new Set(stored.map(m => m.round));
-  const roundsInitial = new Set(initialMatches.map(m => m.round));
-  if (roundsStored.size < roundsInitial.size) {
-    matches = initialMatches.slice();
-    saveMatchesToStorage();
-  } else {
-    matches = stored;
-    // merge scorer info from initialMatches into stored matches when missing
-    try{
-      initialMatches.forEach(im => {
-        const found = matches.find(m => m.round === im.round && m.home === im.home && m.away === im.away);
-        if(found){
-          if((!found.homeScorers || !found.homeScorers.length) && im.homeScorers && im.homeScorers.length){
-            found.homeScorers = im.homeScorers.slice();
-          }
-          if((!found.awayScorers || !found.awayScorers.length) && im.awayScorers && im.awayScorers.length){
-            found.awayScorers = im.awayScorers.slice();
-          }
-        } else {
-          // add missing match from initial set (e.g., new rounds added later)
-          matches.push({ ...im });
-        }
-      });
-      // persist merged result
-      saveMatchesToStorage();
-    }catch(e){ console.warn('merge scorers error', e); }
-  }
-} else {
-  matches = initialMatches.slice();
-  saveMatchesToStorage();
-}
+// Always reset localStorage to initialMatches on page load to guarantee all rounds appear
+try { localStorage.removeItem(STORAGE_KEY); } catch(e) {}
+matches = initialMatches.slice();
+saveMatchesToStorage();
 
 // Normalize scorer strings (emoji sequences, trailing spaces) to 'Name' or 'Name xN'
 function normalizeScorerString(s){
