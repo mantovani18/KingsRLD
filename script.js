@@ -10,7 +10,7 @@ const initialMatches = [
     homeGoals: 3,
     awayGoals: 3,
     homeScorers: ['Vitor Soares', 'Felipe Vieira', 'Jean'],
-    awayScorers: []
+    awayScorers: ['Caveira', 'Dago', 'Guto']
   },
   // Round 1: Los Galaticos 9 - Fc Revolution 6
   {
@@ -43,7 +43,7 @@ const initialMatches = [
     awayGoals: 2,
     // Rodada 2 - Rud x2, Manhaes
     homeScorers: ['Rud x2', 'Manhaes'],
-    awayScorers: []
+    awayScorers: ['Guto', 'Lucao']
   },
   // Round 3: Los Aliens vs Los Galaticos
   {
@@ -123,7 +123,7 @@ const initialMatches = [
   },
 ];
 
-let matches = [];
+let matches = initialMatches.slice();
 
 // map team names to image files (local images expected)
 const teamLogos = {
@@ -163,18 +163,8 @@ function parseScorerString(s){
   return { name: str, count: 1 };
 }
 
-const STORAGE_KEY = 'kings_matches_v1';
-
-function saveMatchesToStorage(){
-  try{ localStorage.setItem(STORAGE_KEY, JSON.stringify(matches)); }catch(e){ console.warn('save error',e); }
-}
-
-function loadMatchesFromStorage(){
-  try{ const raw = localStorage.getItem(STORAGE_KEY); if(!raw) return null; return JSON.parse(raw); }catch(e){ console.warn('load error',e); return null; }
-}
-
-window.addMatch = function(m){ if(!m) return; if(!m.round) m.round=3; matches.push(m); saveMatchesToStorage(); renderMatches(); renderTable(); updateRoundsSummary(); }
-window.clearMatchesStorage = function(){ localStorage.removeItem(STORAGE_KEY); location.reload(); }
+// localStorage removed: always use initialMatches
+window.addMatch = function(m){ if(!m) return; if(!m.round) m.round=3; matches.push(m); renderMatches(); renderTable(); updateRoundsSummary(); }
 
 // Helpers to modify scorers from console
 // addScorer(matchIdx, 'home'|'away', name, count=1)
@@ -351,11 +341,8 @@ function openSimpleModal(match){
 }
 function closeSimpleModal(){ const modal = document.getElementById('match-modal'); if(!modal) return; modal.classList.remove('show'); modal.setAttribute('aria-hidden','true'); }
 
-// init load
-// Always reset localStorage to initialMatches on page load to guarantee all rounds appear
-try { localStorage.removeItem(STORAGE_KEY); } catch(e) {}
+// Always use initialMatches for rendering
 matches = initialMatches.slice();
-saveMatchesToStorage();
 
 // Normalize scorer strings (emoji sequences, trailing spaces) to 'Name' or 'Name xN'
 function normalizeScorerString(s){
@@ -388,7 +375,7 @@ matches.forEach(m=>{
   if(awayFromScorers && awayFromScorers !== (m.awayGoals||0)) m.awayGoals = awayFromScorers;
 });
 
-saveMatchesToStorage();
+
 
 renderMatches(); renderTable(); renderArtilharia();
 
