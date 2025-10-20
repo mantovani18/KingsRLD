@@ -28,7 +28,28 @@
 
   <main>
     <section id="matches">
-      <h2>Rodadas</h2>
+      <div class="section-head">
+        <h2>Rodadas</h2>
+        <div class="team-toolbar" aria-label="Selecionar time">
+          <span class="toolbar-label">Veja as Escalações</span>
+          <a class="team-chip" href="elencos.html?team=Los%20Aliens" title="Los Aliens">
+            <img src="Aliens.jpg" alt="Los Aliens">
+            <span>Los Aliens</span>
+          </a>
+          <a class="team-chip" href="elencos.html?team=Los%20Galaticos" title="Los Galaticos">
+            <img src="Los Gala.jpg" alt="Los Galaticos">
+            <span>Los Galaticos</span>
+          </a>
+          <a class="team-chip" href="elencos.html?team=Hydra" title="Hydra">
+            <img src="HYdra.jpg" alt="Hydra">
+            <span>Hydra</span>
+          </a>
+          <a class="team-chip" href="elencos.html?team=Fc%20Revolution" title="Fc Revolution">
+            <img src="Fc Rev.jpg" alt="Fc Revolution">
+            <span>Fc Revolution</span>
+          </a>
+        </div>
+      </div>
       <div class="rounds-grid">
         <div class="round-card" id="round-1">
           <div class="round-head">Rodada 1</div>
@@ -41,7 +62,7 @@
         </div>
 
         <div class="round-card pending" id="round-3">
-          <div class="round-head"><span class="muted">Domingo - 19/10/25</span> Rodada 3</div>
+          <div class="round-head"><span class="muted"></span> Rodada 3</div>
           <ul class="match-list"></ul>
         </div>
 
@@ -92,6 +113,8 @@
         </div>
       </div>
     </section>
+    
+  
   </main>
 
   <script src="script.js"></script>
