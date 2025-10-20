@@ -1,0 +1,77 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Kings League — Elencos</title>
+  <link rel="stylesheet" href="styles.css">
+  <link rel="icon" href="Logo.jpg">
+  <style>
+    .page-head{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:12px}
+    .back-link{color:var(--muted);text-decoration:none;border:1px solid rgba(255,255,255,0.08);padding:6px 10px;border-radius:8px}
+  </style>
+  </head>
+<body>
+  <header class="site-header">
+    <div class="brand">
+      <img src="Logo.jpg" alt="Kings League" class="league-logo">
+      <div>
+        <h1>Kings League</h1>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    <section>
+      <div class="page-head">
+        <h2>Elencos</h2>
+        <a class="back-link" href="index.html">← Voltar para Rodadas</a>
+      </div>
+      <div class="team-toolbar" aria-label="Selecionar time">
+        <span class="toolbar-label">Veja as Escalações -></span>
+        <button class="team-chip" data-team="Los Aliens" title="Los Aliens">
+          <img src="Aliens.jpg" alt="Los Aliens">
+          <span>Los Aliens</span>
+        </button>
+        <button class="team-chip" data-team="Los Galaticos" title="Los Galaticos">
+          <img src="Los Gala.jpg" alt="Los Galaticos">
+          <span>Los Galaticos</span>
+        </button>
+        <button class="team-chip" data-team="Hydra" title="Hydra">
+          <img src="HYdra.jpg" alt="Hydra">
+          <span>Hydra</span>
+        </button>
+        <button class="team-chip" data-team="Fc Revolution" title="Fc Revolution">
+          <img src="Fc Rev.jpg" alt="Fc Revolution">
+          <span>Fc Revolution</span>
+        </button>
+      </div>
+      <div id="player-stats" style="margin-top:12px"></div>
+    </section>
+  </main>
+
+  <script src="script.js"></script>
+  <!-- Player Profile Modal -->
+  <div id="player-profile-modal" class="modal" aria-hidden="true">
+    <div class="modal-backdrop"></div>
+    <div class="modal-content" role="dialog" aria-modal="true">
+      <button class="modal-close" id="player-profile-close" aria-label="Fechar">×</button>
+      <div class="profile-header">
+        <div class="profile-avatar">
+          <img id="profile-photo" alt="" />
+          <div class="initials" id="profile-initials"></div>
+        </div>
+        <div class="profile-info">
+          <h3 id="profile-name"></h3>
+          <div class="profile-meta">
+            <span><strong>Posição:</strong> <span id="profile-position"></span></span>
+            <span><strong>Perna:</strong> <span id="profile-foot"></span></span>
+            <span><strong>Idade:</strong> <span id="profile-age"></span></span>
+            <span><strong>Time:</strong> <span id="profile-team"></span></span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</body>
+</html>
