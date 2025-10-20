@@ -449,11 +449,15 @@ matches.forEach(m=>{
   if(awayFromScorers && awayFromScorers !== (m.awayGoals||0)) m.awayGoals = awayFromScorers;
 });
 
-
-
-renderMatches(); renderTable(); renderArtilharia();
-// Renderiza a seção de estatísticas dos jogadores (Los Aliens) se o container existir
+// Initialize everything when DOM is ready
 document.addEventListener('DOMContentLoaded', ()=>{
+  // Render matches, table, and artilharia for index.html
+  renderMatches(); 
+  renderTable(); 
+  renderArtilharia();
+  updateRoundsSummary();
+
+  // Renderiza a seção de estatísticas dos jogadores (Los Aliens) se o container existir
   const container = document.getElementById('player-stats');
   if(container){
     // lê ?team= do URL
@@ -490,8 +494,6 @@ function updateRoundsSummary(){
   const count = roundsWithScores.size;
   el.textContent = `${count} realizada${count===1?'':'s'}`;
 }
-
-updateRoundsSummary();
 
 // Helper: download a cleaned `initialMatches` JS snippet (ready to paste into script.js)
 window.downloadCleanInitialMatches = function(){
