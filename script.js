@@ -50,19 +50,19 @@ const initialMatches = [
     round: 3,
     home: 'Los Aliens',
     away: 'Los Galaticos',
-    homeGoals: null,
-    awayGoals: null,
-    homeScorers: [],
-    awayScorers: []
+    homeGoals: 1,
+    awayGoals: 9,
+    homeScorers: ['Felipe Vieira'],
+    awayScorers: ['Vinícius Knoch x5', 'Manhaes', 'João Gabriel', 'João Felipe', 'Paulo']
   },
   {
     round: 3,
     home: 'Fc Revolution',
     away: 'Hydra',
-    homeGoals: null,
-    awayGoals: null,
-    homeScorers: [],
-    awayScorers: []
+    homeGoals: 5,
+    awayGoals: 3,
+    homeScorers: ['Roque x2', 'Vini', 'Leandro', 'Kaminski'],
+    awayScorers: ['Robinho x2', 'Guto']
   },
   // Round 4: reverse of Round 1 (pending)
   {
@@ -140,9 +140,83 @@ const teamColors = {
   'Hydra': '#94a3b8',
 };
 
+// Roster/Elenco com características dos jogadores
+const teamRosters = {
+  'Los Aliens': [
+    { name: 'Pedro Mantovani', position: 'GK', foot: 'Destro', age: 18, photoPath: 'FotoEu.jpg' },
+    { name: 'Mateus Viana', position: 'LD/Meia', foot: 'Canhoto', age: 23, photoPath: 'players/los-aliens/mateus-viana.jpg' },
+    { name: 'Vitor Soares', position: 'ZAG', foot: 'Canhoto', age: 18, photoPath: 'players/los-aliens/vitor-soares.jpg' },
+    { name: 'João Schneider', position: 'VOL/MEIA', foot: 'Canhoto', age: 23, photoPath: 'players/los-aliens/joao-schneider.jpg' },
+    { name: 'Felipe Vieira', position: 'Meia', foot: 'Destro', age: 18, photoPath: 'players/los-aliens/felipe-vieira.jpg' },
+    { name: 'Ryan Souza', position: 'LD/LE', foot: 'Destro', age: 22, photoPath: 'players/los-aliens/ryan-souza.jpg' },
+    { name: 'Jean Soares', position: 'AT', foot: 'Ambidestro', age: 23, photoPath: 'players/los-aliens/jean-soares.jpg' },
+    { name: 'Pedro Araújo', position: 'MC/AT', foot: 'Destro', age: 20, photoPath: 'players/los-aliens/pedro-araujo.jpg' },
+  ],
+  'Los Galaticos': [
+    { name: 'Paulo Martos', position: 'Goleiro', foot: 'Direita', age: 24, photoPath: 'players/los-galaticos/paulo-martos.jpg' },
+    { name: 'Arthur Moloni', position: 'Lateral', foot: 'Direita', age: 18, photoPath: 'players/los-galaticos/arthur-moloni.jpg' },
+    { name: 'Douglas', position: 'Zagueiro', foot: 'Direita', age: 21, photoPath: 'players/los-galaticos/douglas.jpg' },
+    { name: 'Rud', position: 'Lateral', foot: 'Esquerda', age: 26, photoPath: 'players/los-galaticos/rud.jpg' },
+    { name: 'Gustavo Berbel', position: 'Volante', foot: 'Destro', age: 18, photoPath: 'players/los-galaticos/gustavo-berbel.jpg' },
+    { name: 'Matheus Manhaes', position: 'Volante', foot: 'Destro', age: 20, photoPath: 'players/los-galaticos/matheus-manhaes.jpg' },
+    { name: 'Vinícius Knoch', position: 'Meia', foot: 'Destro', age: 26, photoPath: 'players/los-galaticos/vinicius-knoch.jpg' },
+    { name: 'João Gabriel', position: 'Atacante', foot: 'Destro', age: 20, photoPath: 'players/los-galaticos/joao-gabriel.jpg' },
+    { name: 'Hugo Ryan', position: 'Zagueiro', foot: 'Destro', age: 20, photoPath: 'players/los-galaticos/hugo-ryan.jpg' },
+    { name: 'João Felipe', position: 'Lateral', foot: 'Destro', age: 17, photoPath: 'players/los-galaticos/joao-felipe.jpg' },
+    { name: 'Luiz Park', position: 'Meia', foot: 'Destro', age: 19, photoPath: 'players/los-galaticos/luiz-park.jpg' },
+    { name: 'Daniel Cobra', position: 'Lateral', foot: 'Destro', age: 20, photoPath: 'players/los-galaticos/daniel-cobra.jpg' },
+  ],
+};
+
 function initials(name){
   if (!name) return '';
   return name.split(' ').map(s=>s[0]).slice(0,2).join('').toUpperCase();
+}
+
+// Renderiza uma tabela HTML com as características dos jogadores
+function renderPlayerCharsTable(teamName){
+  const roster = teamRosters[teamName];
+  if(!roster || !roster.length) return '<p class="muted">Sem elenco cadastrado</p>';
+  let html = '<table class="art-table"><thead><tr>'+
+    '<th>Nome</th><th>Posição</th><th>Perna Boa</th><th>Idade</th>'+
+    '</tr></thead><tbody>';
+  roster.forEach(p=>{
+    html += `<tr><td>${p.name}</td><td>${p.position}</td><td>${p.foot}</td><td>${p.age}</td></tr>`;
+  });
+  html += '</tbody></table>';
+  return html;
+}
+
+// Renderiza cards no estilo "ficha" para o elenco
+function renderRosterCards(teamName){
+  const roster = teamRosters[teamName];
+  if(!roster || !roster.length) return '<p class="muted">Sem elenco cadastrado</p>';
+  const escape = (s)=> String(s==null?'':s).replace(/[&<>]/g, c=>({"&":"&amp;","<":"&lt;",">":"&gt;"}[c]));
+  let html = '<div class="roster-grid">';
+  roster.forEach(p=>{
+    const initials = (p.name||'').split(' ').map(x=>x[0]).slice(0,2).join('').toUpperCase();
+    // suporte a foto: p.photoPath (absoluto/relativo) ou padrão players/{team}/{slug}.jpg
+    const slug = (str)=> String(str||'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/(^-|-$)/g,'');
+    const defaultPhoto = `players/${slug(teamName)}/${slug(p.name)}.jpg`;
+    const photo = p.photoPath || defaultPhoto;
+    html += `
+      <div class="player-card">
+        <div class="player-avatar">
+          <img class="player-avatar-img" src="${photo}" alt="${escape(p.name)}" onerror="this.style.display='none'; this.parentElement.querySelector('.initials').style.display='flex'"/>
+          <div class="initials" aria-hidden="true">${initials}</div>
+        </div>
+        <div class="player-info">
+          <div class="player-name">${escape(p.name)}</div>
+          <div class="player-meta">
+            <span><strong>Posição:</strong> ${escape(p.position)}</span>
+            <span><strong>Perna:</strong> ${escape(p.foot)}</span>
+            <span><strong>Idade:</strong> ${escape(p.age)}</span>
+          </div>
+        </div>
+      </div>`;
+  });
+  html += '</div>';
+  return html;
 }
 
 // parse a scorer string like 'Jean x2' or 'Joao Gabriel x3' or just 'Jean'
@@ -378,6 +452,33 @@ matches.forEach(m=>{
 
 
 renderMatches(); renderTable(); renderArtilharia();
+// Renderiza a seção de estatísticas dos jogadores (Los Aliens) se o container existir
+document.addEventListener('DOMContentLoaded', ()=>{
+  const container = document.getElementById('player-stats');
+  if(container){
+    // lê ?team= do URL
+    const params = new URLSearchParams(window.location.search);
+    const teamParam = params.get('team');
+    const team = teamParam && teamRosters[teamParam] ? teamParam : 'Los Aliens';
+    container.innerHTML = `<h3>${team} — Elenco</h3>${renderRosterCards(team)}`;
+    // ativa chip correspondente (em elencos.html chips são buttons com data-team)
+    const chipSel = document.querySelector(`.team-chip[data-team="${team}"]`);
+    if(chipSel) chipSel.classList.add('active');
+    // em elencos.html, os chips são buttons: permitem trocar sem recarregar
+    document.querySelectorAll('.team-chip[data-team]').forEach(btn=>{
+      btn.addEventListener('click', (e)=>{
+        const t = btn.getAttribute('data-team');
+        document.querySelectorAll('.team-chip').forEach(b=>b.classList.remove('active'));
+        btn.classList.add('active');
+        container.innerHTML = `<h3>${t} — Elenco</h3>${renderRosterCards(t)}`;
+        // rebind player-card clicks after rerender
+        bindPlayerCardClicks(t);
+      });
+    });
+    // initial bind for current team
+    bindPlayerCardClicks(team);
+  }
+});
 
 // Update dynamic rounds summary (completed rounds with at least one played match)
 function updateRoundsSummary(){
@@ -403,5 +504,70 @@ window.downloadCleanInitialMatches = function(){
     const a = document.createElement('a'); a.href = url; a.download = 'initialMatches-clean.js'; document.body.appendChild(a); a.click(); a.remove(); URL.revokeObjectURL(url);
     console.log('Downloaded initialMatches-clean.js — abra e cole o bloco dentro de script.js no repositório.');
   }catch(e){ console.error('download failed', e); }
+}
+
+// Bind click events on player cards to open profile modal
+function bindPlayerCardClicks(teamName){
+  const wrap = document.getElementById('player-stats'); if(!wrap) return;
+  wrap.querySelectorAll('.player-card').forEach((card, idx)=>{
+    card.addEventListener('click', ()=>{
+      const roster = teamRosters[teamName] || [];
+      const p = roster[idx]; if(!p) return;
+      openPlayerProfile(teamName, p);
+    });
+  });
+}
+
+function slug(str){
+  return String(str||'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/(^-|-$)/g,'');
+}
+
+function openPlayerProfile(teamName, player){
+  const modal = document.getElementById('player-profile-modal'); if(!modal) return;
+  const photoEl = document.getElementById('profile-photo');
+  const initialsEl = document.getElementById('profile-initials');
+  const nameEl = document.getElementById('profile-name');
+  const posEl = document.getElementById('profile-position');
+  const footEl = document.getElementById('profile-foot');
+  const ageEl = document.getElementById('profile-age');
+  const teamEl = document.getElementById('profile-team');
+
+  const defPhoto = `players/${slug(teamName)}/${slug(player.name)}.jpg`;
+  const photo = player.photoPath || defPhoto;
+
+  // reset initials visibility
+  initialsEl.style.display = 'none';
+  initialsEl.textContent = (player.name||'').split(' ').map(x=>x[0]).slice(0,2).join('').toUpperCase();
+  photoEl.style.display = 'block';
+  photoEl.src = photo;
+  photoEl.alt = player.name || '';
+  photoEl.onerror = ()=>{ photoEl.style.display='none'; initialsEl.style.display='flex'; };
+
+  nameEl.textContent = player.name || '';
+  posEl.textContent = player.position || '-';
+  footEl.textContent = player.foot || '-';
+  ageEl.textContent = (player.age!=null)? String(player.age) : '-';
+  teamEl.textContent = teamName;
+
+  // open
+  modal.classList.add('show');
+  modal.setAttribute('aria-hidden','false');
+
+  // one-time close bindings
+  if(!modal.dataset.init){
+    const closeBtn = document.getElementById('player-profile-close');
+    const backdrop = modal.querySelector('.modal-backdrop');
+    if(closeBtn) closeBtn.addEventListener('click', closePlayerProfile);
+    if(backdrop) backdrop.addEventListener('click', closePlayerProfile);
+    document.addEventListener('keydown', escCloseProfile);
+    modal.dataset.init='1';
+  }
+}
+
+function escCloseProfile(e){ if(e.key === 'Escape') closePlayerProfile(); }
+function closePlayerProfile(){
+  const modal = document.getElementById('player-profile-modal'); if(!modal) return;
+  modal.classList.remove('show');
+  modal.setAttribute('aria-hidden','true');
 }
 
