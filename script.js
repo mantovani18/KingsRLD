@@ -450,59 +450,78 @@ matches.forEach(m=>{
 });
 
 // Initialize everything when DOM is ready
-document.addEventListener('DOMContentLoaded', ()=>{
-  console.log('[DEBUG] DOM ready, initializing...');
+(function() {
+  'use strict';
   
-  // Render matches, table, and artilharia for index.html
-  renderMatches(); 
-  renderTable(); 
-  renderArtilharia();
-  updateRoundsSummary();
+  function init() {
+    console.log('[DEBUG] DOM ready, initializing...');
+    
+    // Render matches, table, and artilharia for index.html
+    try {
+      renderMatches(); 
+      renderTable(); 
+      renderArtilharia();
+      updateRoundsSummary();
+    } catch(e) {
+      console.log('[DEBUG] Not on index page or error:', e.message);
+    }
 
-  // Renderiza a seção de estatísticas dos jogadores (Los Aliens) se o container existir
-  const container = document.getElementById('player-stats');
-  console.log('[DEBUG] player-stats container:', container);
-  
-  if(container){
-    // lê ?team= do URL
-    const params = new URLSearchParams(window.location.search);
-    const teamParam = params.get('team');
-    console.log('[DEBUG] URL params:', window.location.search);
-    console.log('[DEBUG] teamParam from URL:', teamParam);
-    console.log('[DEBUG] Available rosters:', Object.keys(teamRosters));
+    // Renderiza a seção de estatísticas dos jogadores se o container existir
+    const container = document.getElementById('player-stats');
+    console.log('[DEBUG] player-stats container:', container);
     
-    const team = teamParam && teamRosters[teamParam] ? teamParam : 'Los Aliens';
-    console.log('[DEBUG] Selected team:', team);
-    
-    const rosterHTML = renderRosterCards(team);
-    console.log('[DEBUG] Roster HTML length:', rosterHTML.length);
-    
-    container.innerHTML = `<h3>${team} — Elenco</h3>${rosterHTML}`;
-    console.log('[DEBUG] Container updated with roster');
-    
-    // ativa chip correspondente (em elencos.html chips são buttons com data-team)
-    const chipSel = document.querySelector(`.team-chip[data-team="${team}"]`);
-    console.log('[DEBUG] Chip selector result:', chipSel);
-    if(chipSel) chipSel.classList.add('active');
-    
-    // em elencos.html, os chips são buttons: permitem trocar sem recarregar
-    document.querySelectorAll('.team-chip[data-team]').forEach(btn=>{
-      btn.addEventListener('click', (e)=>{
-        const t = btn.getAttribute('data-team');
-        console.log('[DEBUG] Chip clicked:', t);
-        document.querySelectorAll('.team-chip').forEach(b=>b.classList.remove('active'));
-        btn.classList.add('active');
-        container.innerHTML = `<h3>${t} — Elenco</h3>${renderRosterCards(t)}`;
-        // rebind player-card clicks after rerender
-        bindPlayerCardClicks(t);
-      });
-    });
-    // initial bind for current team
-    bindPlayerCardClicks(team);
-  } else {
-    console.log('[DEBUG] No player-stats container found - this is probably index.html');
+    if(container){
+      try {
+        // lê ?team= do URL
+        const urlParams = new URLSearchParams(window.location.search);
+        const teamParam = urlParams.get('team');
+        console.log('[DEBUG] URL params:', window.location.search);
+        console.log('[DEBUG] teamParam from URL:', teamParam);
+        console.log('[DEBUG] Available rosters:', Object.keys(teamRosters));
+        
+        const team = (teamParam && teamRosters[teamParam]) ? teamParam : 'Los Aliens';
+        console.log('[DEBUG] Selected team:', team);
+        
+        const rosterHTML = renderRosterCards(team);
+        console.log('[DEBUG] Roster HTML length:', rosterHTML.length);
+        
+        container.innerHTML = '<h3>' + team + ' — Elenco</h3>' + rosterHTML;
+        console.log('[DEBUG] Container updated with roster');
+        
+        // ativa chip correspondente (em elencos.html chips são buttons com data-team)
+        const chipSel = document.querySelector('.team-chip[data-team="' + team + '"]');
+        console.log('[DEBUG] Chip selector result:', chipSel);
+        if(chipSel) chipSel.classList.add('active');
+        
+        // em elencos.html, os chips são buttons: permitem trocar sem recarregar
+        const chips = document.querySelectorAll('.team-chip[data-team]');
+        chips.forEach(function(btn){
+          btn.addEventListener('click', function(e) {
+            const t = btn.getAttribute('data-team');
+            console.log('[DEBUG] Chip clicked:', t);
+            document.querySelectorAll('.team-chip').forEach(function(b){ b.classList.remove('active'); });
+            btn.classList.add('active');
+            container.innerHTML = '<h3>' + t + ' — Elenco</h3>' + renderRosterCards(t);
+            // rebind player-card clicks after rerender
+            bindPlayerCardClicks(t);
+          });
+        });
+        // initial bind for current team
+        bindPlayerCardClicks(team);
+      } catch(e) {
+        console.error('[ERROR] Failed to initialize roster:', e);
+      }
+    } else {
+      console.log('[DEBUG] No player-stats container found - this is probably index.html');
+    }
   }
-});
+  
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', init);
+  } else {
+    init();
+  }
+})();
 
 // Update dynamic rounds summary (completed rounds with at least one played match)
 function updateRoundsSummary(){
