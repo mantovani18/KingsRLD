@@ -131,7 +131,8 @@ select,input[type=number]{background:transparent;border:1px solid rgba(255,255,2
 .scorers .scorer{background:rgba(255,255,255,0.03);padding:6px 8px;border-radius:6px;display:flex;justify-content:space-between;align-items:center}
 .scorers .scorer button{background:transparent;border:none;color:var(--muted);cursor:pointer}
 .scorer-line{padding:6px 8px;border-radius:6px;background:rgba(255,255,255,0.02);color:var(--text);font-weight:600}
-.matches-note{margin-top:10px;padding:10px;border-radius:8px;background:#fff7c2;color:#4b3d00;font-weight:700}
+.matches-note{margin-top:10px;padding:10px;border-radius:8px;color:#e6eef8;font-weight:400;text-align:center}
+.matches-note .highlight{background:#fff7c2;color:#4b3d00;padding:2px 6px;border-radius:4px;font-weight:700}
 .artilharia-table-wrap{width:100%}
 .art-table{width:100%;border-collapse:collapse;margin-top:8px;margin-bottom:12px}
 .art-table thead th{background:rgba(255,255,255,0.02);padding:6px;text-align:left;color:var(--muted);font-size:13px}
