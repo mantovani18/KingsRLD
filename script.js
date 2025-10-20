@@ -451,6 +451,8 @@ matches.forEach(m=>{
 
 // Initialize everything when DOM is ready
 document.addEventListener('DOMContentLoaded', ()=>{
+  console.log('[DEBUG] DOM ready, initializing...');
+  
   // Render matches, table, and artilharia for index.html
   renderMatches(); 
   renderTable(); 
@@ -459,19 +461,35 @@ document.addEventListener('DOMContentLoaded', ()=>{
 
   // Renderiza a seção de estatísticas dos jogadores (Los Aliens) se o container existir
   const container = document.getElementById('player-stats');
+  console.log('[DEBUG] player-stats container:', container);
+  
   if(container){
     // lê ?team= do URL
     const params = new URLSearchParams(window.location.search);
     const teamParam = params.get('team');
+    console.log('[DEBUG] URL params:', window.location.search);
+    console.log('[DEBUG] teamParam from URL:', teamParam);
+    console.log('[DEBUG] Available rosters:', Object.keys(teamRosters));
+    
     const team = teamParam && teamRosters[teamParam] ? teamParam : 'Los Aliens';
-    container.innerHTML = `<h3>${team} — Elenco</h3>${renderRosterCards(team)}`;
+    console.log('[DEBUG] Selected team:', team);
+    
+    const rosterHTML = renderRosterCards(team);
+    console.log('[DEBUG] Roster HTML length:', rosterHTML.length);
+    
+    container.innerHTML = `<h3>${team} — Elenco</h3>${rosterHTML}`;
+    console.log('[DEBUG] Container updated with roster');
+    
     // ativa chip correspondente (em elencos.html chips são buttons com data-team)
     const chipSel = document.querySelector(`.team-chip[data-team="${team}"]`);
+    console.log('[DEBUG] Chip selector result:', chipSel);
     if(chipSel) chipSel.classList.add('active');
+    
     // em elencos.html, os chips são buttons: permitem trocar sem recarregar
     document.querySelectorAll('.team-chip[data-team]').forEach(btn=>{
       btn.addEventListener('click', (e)=>{
         const t = btn.getAttribute('data-team');
+        console.log('[DEBUG] Chip clicked:', t);
         document.querySelectorAll('.team-chip').forEach(b=>b.classList.remove('active'));
         btn.classList.add('active');
         container.innerHTML = `<h3>${t} — Elenco</h3>${renderRosterCards(t)}`;
@@ -481,6 +499,8 @@ document.addEventListener('DOMContentLoaded', ()=>{
     });
     // initial bind for current team
     bindPlayerCardClicks(team);
+  } else {
+    console.log('[DEBUG] No player-stats container found - this is probably index.html');
   }
 });
 
